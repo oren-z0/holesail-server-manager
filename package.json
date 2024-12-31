@@ -1,0 +1,50 @@
+{
+  "name": "holesail-server-manager",
+  "type": "commonjs",
+  "version": "1.0.0",
+  "description": "A web server to manage a holesail-server instance",
+  "main": "server.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "ensure-dist": "mkdir -p dist",
+    "dev": "npm run clean && concurrently \"npm run watch:server\" \"npm run watch:css\" \"npm run watch:static\"",
+    "watch:server": "npm run ensure-dist && nodemon -w \"src/*.js\" --exec \"npm run build:server && node dist/server.js\"",
+    "watch:css": "npm run ensure-dist && npm run build:css -- --watch",
+    "watch:static": "npm run ensure-dist && nodemon -w \"src/static/**/*\" -e \"*\" --exec \"npm run build:static\"",
+    "build": "npm run build:server && npm run build:static && npm run build:css",
+    "build:server": "npm run ensure-dist && cp src/server.js dist/server.js",
+    "build:static": "npm run ensure-dist && mkdir -p dist/static && cp -r src/static/* dist/static",
+    "build:css": "npm run ensure-dist && tailwindcss -i ./src/css/style.css -o ./dist/static/style.css",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oren-z0/holesail-server-manager.git"
+  },
+  "dependencies": {
+    "@fastify/static": "^8.0.3",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-html": "^8.1.2",
+    "eslint-plugin-promise": "^7.2.1",
+    "nodemon": "^3.1.9",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  },
+  "keywords": [
+    "Holesail"
+  ],
+  "author": "orenz0@protonmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oren-z0/holesail-server-manager/issues"
+  },
+  "homepage": "https://github.com/oren-z0/holesail-server-manager#readme"
+}

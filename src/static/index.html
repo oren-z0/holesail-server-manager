@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+<body x-data="appData()">
+    <section>
+        <div class="container mx-auto py-24" x-cloak>
+            <div class="sm:mx-auto sm:w-full sm:max-w-xl">
+                <div class="flex justify-center" x-show="initialLoadingState === 'loading'">
+                    <svg class="animate-spin h-8 w-8 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+                <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-600" x-text="title"></h2>
+                <div class="px-4 py-8 sm:px-10">
+                    <div class="space-y-1">
+                        <div x-show="initialLoadingState === 'error'">
+                            <div class="block text-sm font-medium text-red-500">
+                                Server did not respond. Try restarting the server and refreshing the page.
+                            </div>
+                        </div>
+                        <div x-show="initialLoadingState === 'loaded'">
+                            <label for="seed" class="block text-sm font-medium text-gray-700"> Seed </label>
+                            <div class="mt-1 flex flex-row gap-2">
+                                <div x-data="{ showSeed: false }" class="relative flex-1">
+                                    <input
+                                        :type="showSeed ? 'text' : 'password'"
+                                        id="seed"
+                                        :class="{
+                                            'block w-full pl-4 pr-14 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300': true,
+                                            'border-red-500': !isValidSeed,
+                                            'border-transparent': isValidSeed
+                                        }"
+                                        placeholder="Enter seed value"
+                                        x-model="seed"
+                                        @input="validateSeed()"
+                                    />
+                                    <button type="button"  @click="showSeed = !showSeed" class="absolute right-8 top-1/2 -translate-y-1/2 text-neutral-600" aria-label="Show seed">
+                                        <svg x-show="!showSeed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                        <svg x-show="showSeed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                        </svg>
+                                    </button>
+                                    <button type="button"  @click="copySeedToClipboard()" class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-600" aria-label="Copy seed to clipboard">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="flex items-center">
+                                    <button type="button" @click="createNewSeed()" class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hover:bg-red-700 focus:outline-none">
+                                        Create New Seed
+                                    </button>
+                                </div>
+                            </div>
+                            <p :class="{ 'mt-1 text-xs font-medium text-red-500': true, invisible: isValidSeed }">
+                                Seed must be 64 characters long and contain only hexadecimal characters.
+                            </p>
+                        </div>
+                        <div x-show="initialLoadingState === 'loaded'" class="mt-1">
+                            <button
+                                @click="saveSeed()"
+                                :disabled="isSavingDisabled()"
+                                class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-white transition duration-500 ease-in-out transform rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed enabled:bg-blue-600 enabled:hover:bg-blue-700 enabled:focus:ring-blue-500"
+                            >
+                                <svg x-show="busyReason === 'saving'" class="animate-spin h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span x-show="busyReason !== 'saving'">Save Changes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div x-cloak>
+        <div class="group pointer-events-none fixed inset-x-8 z-[99] flex flex-col gap-2 bg-transparent px-6 py-6 max-w-full md:left-[unset] md:right-0 top-0 md:w-96">
+            <template x-for="(notification, index) in notifications" x-bind:key="notification.id">
+                <div>
+                    <template x-if="notification.variant === 'success'">
+                        <div
+                            class="pointer-events-auto relative rounded-md border border-green-500 bg-white text-neutral-600"
+                            role="alert"
+                            x-data="notificationData(notification.id)"
+                            x-cloak
+                            x-show="isVisible"
+                            x-transition:enter="transition duration-300 ease-out"
+                            x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="-translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="opacity-0 translate-x-24"
+                            x-transition:leave-start="translate-x-0 opacity-100"
+                        >
+                            <div class="flex w-full items-center gap-2.5 bg-green-500/10 rounded-md p-4 transition-all duration-300">
+                                <div class="rounded-full bg-green-500/15 p-0.5 text-green-500" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <h3 class="text-sm font-semibold text-green-500">Success!</h3>
+                                    <p x-show="notification.message" class="text-pretty text-sm" x-text="notification.message"></p>
+                                </div>
+                                <button type="button" class="ml-auto" aria-label="dismiss notification" x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="notification.variant === 'error'">
+                        <div
+                            class="pointer-events-auto relative rounded-md border border-red-500 bg-white text-neutral-600"
+                            role="alert"
+                            x-data="notificationData(notification.id)"
+                            x-cloak
+                            x-show="isVisible"
+                            x-transition:enter="transition duration-300 ease-out"
+                            x-transition:enter-end="translate-y-0"
+                            x-transition:enter-start="-translate-y-8"
+                            x-transition:leave="transition duration-300 ease-in"
+                            x-transition:leave-end="translate-x-24 opacity-0"
+                            x-transition:leave-start="translate-x-0 opacity-100"
+                        >
+                            <div class="flex w-full items-center gap-2.5 bg-red-500/10 rounded-md p-4 transition-all duration-300">
+                                <div class="rounded-full bg-red-500/15 p-0.5 text-red-500" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-8-5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 10 5Zm0 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="flex flex-col gap-2">
+                                    <h3 class="text-sm font-semibold text-red-500">Error!</h3>
+                                    <p x-show="notification.message" class="text-pretty text-sm" x-text="notification.message"></p>
+                                </div>
+                                <button type="button" class="ml-auto" aria-label="dismiss notification" x-on:click="(isVisible = false), removeNotification(notification.id)">
+                                    <svg xmlns="http://www.w3.org/2000/svg viewBox="0 0 24 24 stroke="currentColor" fill="none" stroke-width="2" class="size-5 shrink-0" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+    <script>
+        /* eslint-disable-next-line no-unused-vars */
+        function appData() {
+            return {
+                title: '',
+                initialLoadingState: 'loading',
+                busyReason: null,
+                seed: '',
+                originalSeed: '',
+                isValidSeed: true,
+                notifications: [],
+                setTitle(title) {
+                    this.title = title;
+                    document.title = title;
+                },
+                validateSeed() {
+                    this.isValidSeed = this.seed.length === 64 && /^[0-9a-fA-F]+$/.test(this.seed);
+                },
+                copySeedToClipboard() {
+                    try {
+                        navigator.clipboard.writeText(this.seed);
+                        this.addNotification({
+                            variant: 'success',
+                            message: 'Seed copied to clipboard.',
+                        });
+                    } catch (err) {
+                        console.error('copySeedToClipboard error', err);
+                        this.addNotification({
+                            variant: 'error',
+                            message: 'Failed to copy seed to clipboard.',
+                        });
+                    }
+                },
+                createNewSeed() {
+                    try {
+                        this.seed = Array.from(
+                            crypto.getRandomValues(new Uint8Array(32)),
+                            b => b.toString(16).padStart(2, '0'),
+                        ).join('');
+                        this.validateSeed();
+                        this.addNotification({
+                            variant: 'success',
+                            message: 'New seed created. Don\'t forget to save it.',
+                        });
+                    } catch (err) {
+                        console.error('createNewSeed error', err);
+                        this.addNotification({
+                            variant: 'error',
+                            message: 'Failed to create new seed.',
+                        });
+                    }
+                },
+                isSavingDisabled() {
+                    return this.initialLoadingState !== 'loaded' ||
+                        this.seed === this.originalSeed ||
+                        this.busyReason ||
+                        !this.isValidSeed;
+                },
+                init() {
+                    void this.loadSettings();
+                    window.addEventListener('beforeunload', (e) => {
+                        if (this.seed !== this.originalSeed) {
+                            e.preventDefault();
+                            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                        }
+                    });
+                },
+                async loadSettings() {
+                    this.busyReason = 'loading';
+                    try {
+                        const response = await fetch('/api/settings', {
+                            signal: AbortSignal.timeout(7000)
+                        });
+                        const data = await response.json();
+                        this.seed = data.seed;
+                        this.originalSeed = data.seed;
+                        this.setTitle(data.title || 'Holesail Server Manager');
+                        this.validateSeed();
+                        if (this.initialLoadingState !== 'loaded') {
+                            this.initialLoadingState = 'loaded';
+                        }
+                    } catch (err) {
+                        console.error('loadSettings error', err);
+                        if (this.initialLoadingState === 'loaded') {
+                            this.addNotification({
+                                variant: 'error',
+                                message: 'Failed to load settings.',
+                            });
+                        } else {
+                            this.initialLoadingState = 'error';
+                            this.setTitle('Holesail Server Manager');
+                        }
+                    } finally {
+                        this.busyReason = null;
+                    }
+                },
+                async saveSeed() {
+                    if (this.isSavingDisabled()) {
+                        // Button should be disabled
+                        return;
+                    }
+                    this.busyReason = 'saving';
+                    try {
+                        const response = await fetch('/api/settings', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ seed: this.seed }),
+                            signal: AbortSignal.timeout(15000)
+                        });
+                        if (response.ok) {
+                            this.originalSeed = this.seed;
+                            this.addNotification({
+                                variant: 'success',
+                                message: 'Seed was saved successfully.',
+                            });
+                        }
+                    } catch (err) {
+                        console.error('saveSettings error', err);
+                        this.addNotification({
+                            variant: 'error',
+                            message: 'Failed to save settings.',
+                        });
+                        return;
+                    } finally {
+                        this.busyReason = null;
+                    }
+                    await this.loadSettings();
+                },
+                addNotification({ variant = 'success', message = null }) {
+                    const id = Date.now();
+                    const notification = { id, variant, message };
+                    // Keep only the most recent 20 notifications
+                    if (this.notifications.length > 20) {
+                        this.notifications.splice(20);
+                    }
+                    this.notifications.unshift(notification);
+                },
+                removeNotification(id) {
+                    setTimeout(() => {
+                        this.notifications = this.notifications.filter(
+                            (notification) => notification.id !== id,
+                        );
+                    }, 400);
+                },
+            };
+        }
+
+        /* eslint-disable-next-line no-unused-vars */
+        function notificationData(notificationId) {
+            return {
+                isVisible: false,
+                init() {
+                    this.$nextTick(() => {
+                        this.isVisible = true;
+                        setTimeout(() => {
+                            this.isVisible = false;
+                            this.removeNotification(notificationId);
+                        }, 4000);
+                    });
+                },
+            };
+        }
+    </script>
+</body>
+</html>
