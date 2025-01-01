@@ -8,7 +8,7 @@
     "start": "node dist/server.js",
     "ensure-dist": "mkdir -p dist",
     "dev": "npm run clean && concurrently \"npm run watch:server\" \"npm run watch:css\" \"npm run watch:static\"",
-    "watch:server": "npm run ensure-dist && nodemon -w \"src/*.js\" --exec \"npm run build:server && node dist/server.js\"",
+    "watch:server": "npm run ensure-dist && nodemon -w \"src/*.js\" -w \".env\" --exec \"npm run build:server && node dist/server.js\"",
     "watch:css": "npm run ensure-dist && npm run build:css -- --watch",
     "watch:static": "npm run ensure-dist && nodemon -w \"src/static/**/*\" -e \"*\" --exec \"npm run build:static\"",
     "build": "npm run build:server && npm run build:static && npm run build:css",
