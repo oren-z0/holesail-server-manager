@@ -74,9 +74,9 @@
                         Seed must be 64 characters long and contain only hexadecimal characters.
                     </p>
                 </div>
-                <div x-show="initialLoadingState === 'loaded'" class="mt-1 flex gap-4">
+                <div x-show="initialLoadingState === 'loaded'" class="flex gap-4">
                     <button
-                        @click="seed = originalSeed"
+                        @click="resetSeed()"
                         :disabled="busyReason"
                         class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-gray-700 transition duration-500 ease-in-out transform border border-gray-300 rounded-xl hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-gray-50"
                     >
@@ -187,6 +187,10 @@
                 validateSeed() {
                     this.isValidSeed = this.seed.length === 64 && /^[0-9a-fA-F]+$/.test(this.seed);
                 },
+                resetSeed() {
+                    this.seed = this.originalSeed;
+                    this.validateSeed();
+                },
                 copySeedToClipboard() {
                     try {
                         navigator.clipboard.writeText(this.seed);
@@ -255,8 +259,8 @@
                             this.seed = data.seed;
                         }
                         this.originalSeed = data.seed;
-                        this.setTitle(data.title || 'Holesail Server Manager');
                         this.validateSeed();
+                        this.setTitle(data.title || 'Holesail Server Manager');
                         if (this.initialLoadingState !== 'loaded') {
                             this.initialLoadingState = 'loaded';
                         }
