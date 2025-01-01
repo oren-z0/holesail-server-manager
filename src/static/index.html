@@ -239,15 +239,25 @@
                             e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
                         }
                     });
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'visible') {
+                            void this.loadSettings();
+                        }
+                    });
                 },
                 async loadSettings() {
+                    if (this.busyReason) {
+                        return;
+                    }
                     this.busyReason = 'loading';
                     try {
                         const response = await fetch('/api/settings', {
-                            signal: AbortSignal.timeout(7000)
+                            signal: AbortSignal.timeout(7000),
                         });
                         const data = await response.json();
-                        this.seed = data.seed;
+                        if (this.initialLoadingState === 'loading' || this.seed === this.originalSeed) {
+                            this.seed = data.seed;
+                        }
                         this.originalSeed = data.seed;
                         this.setTitle(data.title || 'Holesail Server Manager');
                         this.validateSeed();
@@ -276,6 +286,7 @@
                     }
                     this.busyReason = 'saving';
                     try {
+                        this.seed = this.seed.toLowerCase();
                         const response = await fetch('/api/settings', {
                             method: 'POST',
                             headers: {
@@ -284,13 +295,14 @@
                             body: JSON.stringify({ seed: this.seed }),
                             signal: AbortSignal.timeout(15000)
                         });
-                        if (response.ok) {
-                            this.originalSeed = this.seed;
-                            this.addNotification({
-                                variant: 'success',
-                                message: 'Seed was saved successfully.',
-                            });
+                        if (!response.ok || !(await response.json()).success) {
+                            throw new Error(`save api return status ${response.status}.`);
                         }
+                        this.originalSeed = this.seed;
+                        this.addNotification({
+                            variant: 'success',
+                            message: 'Seed was saved successfully.',
+                        });
                     } catch (err) {
                         console.error('saveSettings error', err);
                         this.addNotification({
