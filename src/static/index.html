@@ -22,7 +22,7 @@
                 </svg>
             </div>
             <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-600" x-text="title"></h2>
-            <div class="px-4 py-8 sm:px-10 space-y-1">
+            <div class="px-4 py-8 sm:px-10">
                 <div x-show="initialLoadingState === 'error'">
                     <div class="block text-sm font-medium text-red-500">
                         Server did not respond. Try restarting the server and refreshing the page.
@@ -93,6 +93,23 @@
                         </svg>
                         <span x-show="busyReason !== 'saving'">Save</span>
                     </button>
+                </div>
+                <div x-show="publicKey" class="mt-8">
+                    <label for="public-key" class="block text-sm font-medium text-gray-700"> Public Key </label>
+                    <div class="mt-1 relative">
+                        <input
+                            readonly
+                            type="text"
+                            id="public-key"
+                            class="block w-full pl-4 pr-8 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300"
+                            x-model="publicKey"
+                        />
+                        <button type="button" @click="copyPublicKeyToClipboard()" class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-600" aria-label="Copy seed to clipboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="size-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -178,6 +195,7 @@
                 busyReason: null,
                 seed: '',
                 originalSeed: '',
+                publicKey: '',
                 isValidSeed: true,
                 notifications: [],
                 setTitle(title) {
@@ -203,6 +221,21 @@
                         this.addNotification({
                             variant: 'error',
                             message: 'Failed to copy seed to clipboard.',
+                        });
+                    }
+                },
+                copyPublicKeyToClipboard() {
+                    try {
+                        navigator.clipboard.writeText(this.publicKey);
+                        this.addNotification({
+                            variant: 'success',
+                            message: 'Public Key copied to clipboard.',
+                        });
+                    } catch (err) {
+                        console.error('copyPublicKeyToClipboard error', err);
+                        this.addNotification({
+                            variant: 'error',
+                            message: 'Failed to copy Public Key to clipboard.',
                         });
                     }
                 },
@@ -260,6 +293,7 @@
                         }
                         this.originalSeed = data.seed;
                         this.validateSeed();
+                        this.publicKey = data.publicKey;
                         this.setTitle(data.title || 'Holesail Server Manager');
                         if (this.initialLoadingState !== 'loaded') {
                             this.initialLoadingState = 'loaded';
@@ -299,6 +333,7 @@
                             throw new Error(`save api return status ${response.status}.`);
                         }
                         this.originalSeed = this.seed;
+                        this.publicKey = '';
                         this.addNotification({
                             variant: 'success',
                             message: 'Seed was saved successfully.',
