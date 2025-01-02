@@ -57,7 +57,6 @@ fastify.get('/', (_request, reply) => {
 
 // Routes
 fastify.get('/api/settings', async (request, reply) => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
   try {
     const settings = JSON.parse(await fs.readFile(dataFile, 'utf-8'));
     return {
