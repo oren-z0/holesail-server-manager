@@ -13,7 +13,7 @@
     "watch:static": "npm run ensure-dist && nodemon -w \"src/static/**/*\" -e \"*\" --exec \"npm run build:static\"",
     "build": "npm run build:server && npm run build:static && npm run build:css",
     "build:server": "npm run ensure-dist && cp src/server.js dist/server.js",
-    "build:static": "npm run ensure-dist && mkdir -p dist/static && cp -r src/static/* dist/static && cp node_modules/qr-code-styling/lib/qr-code-styling.js dist/static/qr-code-styling.js",
+    "build:static": "npm run ensure-dist && mkdir -p dist/static && cp -r src/static/* dist/static && cp node_modules/qr-code-styling/lib/qr-code-styling.js dist/static/qr-code-styling.js && cp node_modules/alpinejs/dist/cdn.min.js dist/static/alpine.js",
     "build:css": "npm run ensure-dist && tailwindcss -i ./src/css/style.css -o ./dist/static/style.css",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "alpinejs": "^3.14.8",
     "concurrently": "^9.1.2",
     "eslint": "^9.17.0",
     "eslint-plugin-html": "^8.1.2",
