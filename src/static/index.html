@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+    <script src="/qr-code-styling.js" defer></script>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <link rel="stylesheet" href="/style.css">
     <style>
@@ -14,7 +15,7 @@
 </head>
 <body x-data="appData()">
     <section>
-        <div class="container mx-auto py-24 sm:mx-auto sm:w-full sm:max-w-xl" x-cloak>
+        <div class="container mx-auto py-12 md:py-24 sm:mx-auto sm:w-full sm:max-w-xl" x-cloak>
             <div class="flex justify-center" x-show="initialLoadingState === 'loading'">
                 <svg class="animate-spin h-8 w-8 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -110,6 +111,7 @@
                             </svg>
                         </button>
                     </div>
+                    <div id="qrcode-container" class="mt-4 flex justify-center"></div>
                 </div>
             </div>
         </div>
@@ -190,6 +192,7 @@
         /* eslint-disable-next-line no-unused-vars */
         function appData() {
             return {
+                qrCode: undefined,
                 title: '',
                 initialLoadingState: 'loading',
                 busyReason: null,
@@ -211,6 +214,13 @@
                 },
                 copySeedToClipboard() {
                     try {
+                        if (!navigator.clipboard) {
+                            this.addNotification({
+                                variant: 'error',
+                                message: 'Clipboard API not supported. Is the connection secure? (https)',
+                            });
+                            return;
+                        }
                         navigator.clipboard.writeText(this.seed);
                         this.addNotification({
                             variant: 'success',
@@ -226,6 +236,13 @@
                 },
                 copyPublicKeyToClipboard() {
                     try {
+                        if (!navigator.clipboard) {
+                            this.addNotification({
+                                variant: 'error',
+                                message: 'Clipboard API not supported. Is the connection secure? (https)',
+                            });
+                            return;
+                        }
                         navigator.clipboard.writeText(this.publicKey);
                         this.addNotification({
                             variant: 'success',
@@ -282,6 +299,32 @@
                     if (this.busyReason) {
                         return;
                     }
+                    if (!this.qrCode) {
+                        while (!window.QRCodeStyling) {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                        this.qrCode = new window.QRCodeStyling({
+                            type: 'svg',
+                            width: 300,
+                            height: 300,
+                            data: '',
+                            dotsOptions: {
+                                color: '#000000',
+                                type: 'rounded',
+                            },
+                            backgroundOptions: {
+                                color: '#ffffff',
+                            },
+                            imageOptions: {
+                                imageSize: 0.3,
+                                margin: 4,
+                                crossOrigin: 'anonymous',
+                            },
+                            image: '/images/logo-150x150.png',
+                            margin: 0,
+                        });
+                        this.qrCode.append(document.getElementById('qrcode-container'));
+                    }
                     this.busyReason = 'loading';
                     try {
                         const response = await fetch('/api/settings', {
@@ -293,7 +336,12 @@
                         }
                         this.originalSeed = data.seed;
                         this.validateSeed();
-                        this.publicKey = data.publicKey;
+                        if (this.publicKey !== data.publicKey) {
+                            this.publicKey = data.publicKey;
+                            this.qrCode.update({
+                                data: data.publicKey,
+                            });
+                        }
                         this.setTitle(data.title || 'Holesail Server Manager');
                         if (this.initialLoadingState !== 'loaded') {
                             this.initialLoadingState = 'loaded';
