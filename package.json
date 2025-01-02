@@ -15,6 +15,7 @@
     "build:server": "npm run ensure-dist && cp src/server.js dist/server.js",
     "build:static": "npm run ensure-dist && mkdir -p dist/static && cp -r src/static/* dist/static && cp node_modules/qr-code-styling/lib/qr-code-styling.js dist/static/qr-code-styling.js && cp node_modules/alpinejs/dist/cdn.min.js dist/static/alpine.js",
     "build:css": "npm run ensure-dist && tailwindcss -i ./src/css/style.css -o ./dist/static/style.css",
+    "docker:build-to-registry": "docker buildx build --platform linux/arm64,linux/amd64 --progress plain --tag orenz0/holesail-server-manager:v$(node -p \"require('./package.json').version\") . --output type=registry",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rm -rf dist"
