@@ -101,9 +101,10 @@ async function start() {
     }
     const settings = JSON.parse(await fs.readFile(dataFile, 'utf-8'));
     await serveSeed(settings.seed);
+    const host = process.env.HSM_HOST || '0.0.0.0';
     const port = Number(process.env.HSM_PORT) || 3000;
-    await fastify.listen({ port });
-    fastify.log.info(`Server running on port ${port}`);
+    await fastify.listen({ host, port });
+    fastify.log.info(`Server running on host ${host}, port ${port}.`);
   } catch (err) {
     console.error(err);
     process.exit(1);
