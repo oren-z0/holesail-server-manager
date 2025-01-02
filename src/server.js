@@ -5,7 +5,11 @@ const fs = require('fs/promises');
 const nodeCrypto = require('node:crypto');
 const HolesailServer = require('holesail-server');
 
-const dataFile = process.env.HSM_DATA_FILE && path.join(__dirname, '..', process.env.HSM_DATA_FILE);
+const dataFile = process.env.HSM_DATA_FILE && (
+  path.isAbsolute(process.env.HSM_DATA_FILE)
+  ? process.env.HSM_DATA_FILE
+  : path.join(__dirname, '..', process.env.HSM_DATA_FILE)
+);
 const holesailTargetPort = process.env.HSM_TARGET_PORT && Number(process.env.HSM_TARGET_PORT);
 const holesailTargetAddress = process.env.HSM_TARGET_ADDRESS;
 
