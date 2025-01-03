@@ -1,7 +1,7 @@
 {
   "name": "holesail-server-manager",
   "type": "commonjs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A web server to manage a holesail-server instance",
   "main": "server.js",
   "scripts": {
