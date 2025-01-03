@@ -3,7 +3,7 @@ FROM node:22.12-alpine
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm ci
@@ -14,14 +14,14 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Delete node_modules
-RUN rm -rf node_modules
+# Set environment variables
+ENV NODE_ENV=production
 
-# Install production dependencies
-RUN npm ci --omit=dev
+# Delete unnecessary modules
+RUN npm prune --omit=dev
 
 # Expose default port
 EXPOSE 3000
 
 # Start the server
-CMD ["npm", "start"]
+CMD ["npm", "run","start"]
