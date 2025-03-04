@@ -38,7 +38,7 @@
                                 :type="showSeed ? 'text' : 'password'"
                                 id="seed"
                                 :class="{
-                                    'block w-full pl-4 pr-14 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300': true,
+                                    'block w-full pl-4 pr-14 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300': true,
                                     'border-red-500': !isValidSeed,
                                     'border-transparent': isValidSeed
                                 }"
@@ -64,7 +64,7 @@
                         <div class="flex items-center">
                             <button
                                 type="button"
-                                class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hover:bg-red-700 focus:outline-none"
+                                class="px-4 py-2 text-sm text-white bg-red-600 rounded-lg focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hover:bg-red-700 focus:outline-hidden"
                                 @click="createNewSeed()"
                                 :disabled="busyReason"
                             >
@@ -80,14 +80,14 @@
                     <button
                         @click="resetSeed()"
                         :disabled="busyReason"
-                        class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-gray-700 transition duration-500 ease-in-out transform border border-gray-300 rounded-xl hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-gray-50"
+                        class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-gray-700 transition duration-500 ease-in-out transform border border-gray-300 rounded-xl hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 bg-gray-50"
                     >
                         Reset
                     </button>
                     <button
                         @click="saveSeed()"
                         :disabled="isSavingDisabled()"
-                        class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-white transition duration-500 ease-in-out transform rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed enabled:bg-blue-600 enabled:hover:bg-blue-700 enabled:focus:ring-blue-500"
+                        class="flex items-center justify-center w-full px-10 py-4 text-base font-medium text-center text-white transition duration-500 ease-in-out transform rounded-xl focus:outline-hidden focus:ring-2 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed enabled:bg-blue-600 enabled:hover:bg-blue-700 enabled:focus:ring-blue-500"
                     >
                         <svg x-show="busyReason === 'saving'" class="animate-spin h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -103,7 +103,7 @@
                             readonly
                             type="text"
                             id="public-key"
-                            class="block w-full pl-4 pr-8 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300"
+                            class="block w-full pl-4 pr-8 py-3 text-base text-gray-600 placeholder-gray-300 transition duration-500 ease-in-out transform border rounded-lg bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-300"
                             x-model="publicKey"
                         />
                         <button type="button" @click="copyPublicKeyToClipboard()" class="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-600" aria-label="Copy seed to clipboard">
@@ -118,7 +118,7 @@
         </div>
     </section>
     <div x-cloak>
-        <div class="group pointer-events-none fixed inset-x-8 z-[99] flex flex-col gap-2 bg-transparent px-6 py-6 max-w-full md:left-[unset] md:right-0 top-0 md:w-96">
+        <div class="group pointer-events-none fixed inset-x-8 z-99 flex flex-col gap-2 bg-transparent px-6 py-6 max-w-full md:left-[unset] md:right-0 top-0 md:w-96">
             <template x-for="(notification, index) in notifications" x-bind:key="notification.id">
                 <div>
                     <template x-if="notification.variant === 'success'">
@@ -311,7 +311,7 @@
                             data: '',
                             dotsOptions: {
                                 color: '#000000',
-                                type: 'rounded',
+                                type: 'rounded-sm',
                             },
                             backgroundOptions: {
                                 color: '#ffffff',
